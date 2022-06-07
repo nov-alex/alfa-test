@@ -5,6 +5,14 @@ Alfa-test Application
 * giphy.com - поиск изображений по ключевым словам **broke** и **rich**
 Все настройки в application.properties
 
+# Используемые инструменты
+* Gradle
+* Spring Boot 2
+* Lombok
+* JUnit 5
+* Mockito
+* OpenFeign
+
 # Описание работы
 Базовая валюта задается в application.properties. Сервис предоставляет endpoints для получения списка валют и выдачу ссылки на изображение, визуально представляющую динамику базовой валюты к запрощенной на текущий момент и вчерашний день (UTC).   
 
