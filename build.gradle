@@ -1,42 +1,69 @@
 plugins {
-	id 'org.springframework.boot' version '2.7.1-SNAPSHOT'
-	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
-	id 'java'
+    id 'org.springframework.boot' version '2.7.1-SNAPSHOT'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'java'
 }
 
 group = 'ru.example'
-version = '0.0.1-SNAPSHOT'
+version = '1.0.0'
+targetCompatibility = '17'
 sourceCompatibility = '17'
 
-configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
+tasks.clean {
+    delete "${rootDir}/alfa-test.jar"
 }
 
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+tasks.bootJar {
+    zip64 = true
+    archiveFileName = "alfa-test.jar"
+    doLast {
+        copy {
+            from "${rootDir}/build/libs/alfa-test.jar"
+            into "${rootDir}/"
+        }
+    }
+}
 repositories {
-	mavenCentral()
-	maven { url 'https://repo.spring.io/milestone' }
-	maven { url 'https://repo.spring.io/snapshot' }
+    mavenCentral()
+    maven { url 'https://repo.spring.io/milestone' }
+    maven { url 'https://repo.spring.io/snapshot' }
 }
 
 ext {
-	set('springCloudVersion', "2021.0.3")
+    set('springCloudVersion', "2021.0.3")
 }
 
 dependencies {
-	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
-	compileOnly 'org.projectlombok:lombok'
-	annotationProcessor 'org.projectlombok:lombok'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    implementation group: 'io.github.openfeign', name: 'feign-jackson', version: '11.8'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.0-M1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.0-M1'
+    testImplementation 'org.mockito:mockito-junit-jupiter:4.6.1'
 }
 
 dependencyManagement {
-	imports {
-		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
-	}
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
 }
 
 tasks.named('test') {
-	useJUnitPlatform()
+    useJUnitPlatform()
+}
+
+tasks.register('runDev') {
+    dependsOn 'bootRun'
+    bootRun.systemProperty('logging.level.root', 'TRACE')
+    bootRun.systemProperty('logging.level.org.springframework', 'DEBUG')
+    bootRun.systemProperty('logging.level.org.apache.tomcat.util.net.NioEndpoint', 'WARN')
+    bootRun.systemProperty('logging.pattern.console', '%d{HH:mm:ss.SSS} %clr(%5p) [%logger{0}] %m%n')
 }
